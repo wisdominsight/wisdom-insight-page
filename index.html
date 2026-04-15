@@ -181,15 +181,15 @@
     }
 
     .site-logo {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      object-fit: cover;
-      opacity: 0.9;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      position: relative;
-      z-index: 1;
-    }
+  width: 68px; /* Anda dapat menyesuaikan ukuran ini jika logo terasa terlalu kecil */
+  height: 68px;
+  /* border-radius: 50%; */ /* Hapus atau komentari ini agar logo tidak dipaksa melingkar */
+  object-fit: contain; /* Ubah object-fit ke contain agar seluruh logo terlihat tanpa terpotong */
+  opacity: 0.9;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  position: relative;
+  z-index: 1;
+  }
 
     .site-logo:hover {
       opacity: 1;
@@ -790,11 +790,9 @@
 
   <!-- HEADER -->
   <header class="site-header reveal">
-    <div class="logo-container">
-      <div class="logo-ring"></div>
-      <img src="logo.png" alt="Wisdom Insight" class="site-logo">
-    </div>
-    <span class="header-handle">@wisdom.insight_</span>
+  <div class="logo-container">
+    <img src="logo_wi.png" alt="Wisdom Insight" class="site-logo"> </div>
+  <span class="header-handle">@wisdom.insight_</span>
   </header>
 
   <!-- ORNAMEN PEMBUKA -->
