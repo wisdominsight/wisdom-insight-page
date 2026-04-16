@@ -130,6 +130,7 @@
       height: 100%;
       pointer-events: none;
       z-index: 1;
+      will-change: contents;
     }
 
     /* ============================================
@@ -161,6 +162,7 @@
         transparent 100%);
       transform-origin: top center;
       animation: rayDrift 12s ease-in-out infinite;
+      will-change: opacity, transform;
     }
 
     .light-ray:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 14s; opacity: 0.5; transform: rotate(-8deg); }
@@ -790,6 +792,25 @@
       .side-line-right {
         display: none;
       }
+
+      /* PERFORMANCE: hide heavy layers on mobile */
+      .grain-overlay {
+        display: none;
+      }
+
+      .light-ray:nth-child(n+4) {
+        display: none;
+      }
+
+      .golden-orb {
+        width: 300px;
+        height: 300px;
+        animation-duration: 12s;
+      }
+
+      .ambient-glow {
+        animation: none;
+      }
     }
 
     @media (max-width: 400px) {
@@ -1051,11 +1072,12 @@
     window.addEventListener('resize', updateProgress, { passive: true });
     updateProgress();
 
-    // ── Golden Particles (Fireflies) ──
+    // ── Golden Particles (Fireflies) — OPTIMIZED ──
     const canvas = document.getElementById('particlesCanvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
     let animId;
+    const isMobile = window.innerWidth <= 768;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -1064,6 +1086,19 @@
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+
+    // Pre-render glow sprite ONCE (avoid createRadialGradient per frame)
+    const glowSize = 32;
+    const glowCanvas = document.createElement('canvas');
+    glowCanvas.width = glowSize * 2;
+    glowCanvas.height = glowSize * 2;
+    const glowCtx = glowCanvas.getContext('2d');
+    const glowGrad = glowCtx.createRadialGradient(glowSize, glowSize, 0, glowSize, glowSize, glowSize);
+    glowGrad.addColorStop(0, 'rgba(245, 199, 26, 0.3)');
+    glowGrad.addColorStop(0.5, 'rgba(245, 199, 26, 0.05)');
+    glowGrad.addColorStop(1, 'rgba(245, 199, 26, 0)');
+    glowCtx.fillStyle = glowGrad;
+    glowCtx.fillRect(0, 0, glowSize * 2, glowSize * 2);
 
     class Particle {
       constructor() {
@@ -1079,7 +1114,7 @@
         this.opacity = 0;
         this.targetOpacity = Math.random() * 0.5 + 0.1;
         this.fadeSpeed = Math.random() * 0.005 + 0.002;
-        this.phase = 'in'; // in, hold, out
+        this.phase = 'in';
         this.holdTime = Math.random() * 200 + 100;
         this.holdCounter = 0;
         this.wobble = Math.random() * Math.PI * 2;
@@ -1109,7 +1144,6 @@
           }
         }
 
-        // Wrap around edges
         if (this.y < -20) this.y = canvas.height + 20;
         if (this.x < -20) this.x = canvas.width + 20;
         if (this.x > canvas.width + 20) this.x = -20;
@@ -1117,54 +1151,58 @@
 
       draw() {
         if (this.opacity <= 0) return;
-        ctx.save();
         ctx.globalAlpha = this.opacity;
 
-        // Outer glow
-        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 6);
-        grad.addColorStop(0, 'rgba(245, 199, 26, 0.3)');
-        grad.addColorStop(0.5, 'rgba(245, 199, 26, 0.05)');
-        grad.addColorStop(1, 'rgba(245, 199, 26, 0)');
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 6, 0, Math.PI * 2);
-        ctx.fill();
+        // Draw pre-rendered glow sprite (FAST — no gradient creation)
+        const drawSize = this.size * 6;
+        ctx.drawImage(glowCanvas, this.x - drawSize, this.y - drawSize, drawSize * 2, drawSize * 2);
 
         // Core dot
         ctx.fillStyle = '#F5C71A';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.restore();
       }
     }
 
-    // Spawn particles based on screen size
-    const particleCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 18000), 50);
+    // Mobile: fewer particles
+    const particleCount = isMobile
+      ? Math.min(Math.floor((window.innerWidth * window.innerHeight) / 40000), 12)
+      : Math.min(Math.floor((window.innerWidth * window.innerHeight) / 18000), 50);
+
     for (let i = 0; i < particleCount; i++) {
       const p = new Particle();
-      p.holdCounter = Math.random() * 200; // stagger start
+      p.holdCounter = Math.random() * 200;
       particles.push(p);
     }
 
-    function animateParticles() {
+    // Mobile: throttle to ~24fps, Desktop: full 60fps
+    const frameInterval = isMobile ? 42 : 0;
+    let lastFrame = 0;
+
+    function animateParticles(timestamp) {
+      animId = requestAnimationFrame(animateParticles);
+
+      if (frameInterval && timestamp - lastFrame < frameInterval) return;
+      lastFrame = timestamp;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 1;
       particles.forEach(p => {
         p.update();
         p.draw();
       });
-      animId = requestAnimationFrame(animateParticles);
+      ctx.globalAlpha = 1;
     }
 
-    animateParticles();
+    animateParticles(0);
 
     // Pause when tab not visible
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         cancelAnimationFrame(animId);
       } else {
-        animateParticles();
+        animateParticles(0);
       }
     });
   </script>
