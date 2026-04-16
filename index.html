@@ -22,7 +22,7 @@
       --deep:     #060504;
       --text:     #E8E2D6;
       --gold:     #F5C71A;
-      --gold-dim: rgba(245, 199, 26, 0.55);
+      --gold-dim: rgba(245, 199, 26, 0.72);
       --gold-faint: rgba(245, 199, 26, 0.25);
       --border:   #F5C71A;
     }
@@ -811,6 +811,12 @@
       .ambient-glow {
         animation: none;
       }
+
+      .narrative p,
+      .cta-text p,
+      .cta-text .cta-emphasis {
+        font-size: clamp(1.05rem, 3.5vw, 1.25rem);
+      }
     }
 
     @media (max-width: 400px) {
@@ -1015,7 +1021,7 @@
     </div>
     <div class="cta-button-wrap reveal reveal-delay-2">
       <a
-        href="https://wa.me/6281217679892?text=Halo%20WI%2C%20Perkenalkan%20saya%20..."
+        href="https://wa.me/6281217679892?text=Halo%20WI%2C%20perkenalkan%20saya%20..."
         class="wa-button"
         target="_blank"
         rel="noopener noreferrer"
@@ -1087,18 +1093,25 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Pre-render glow sprite ONCE (avoid createRadialGradient per frame)
+    // Pre-render glow sprites ONCE (gold + white)
     const glowSize = 32;
-    const glowCanvas = document.createElement('canvas');
-    glowCanvas.width = glowSize * 2;
-    glowCanvas.height = glowSize * 2;
-    const glowCtx = glowCanvas.getContext('2d');
-    const glowGrad = glowCtx.createRadialGradient(glowSize, glowSize, 0, glowSize, glowSize, glowSize);
-    glowGrad.addColorStop(0, 'rgba(245, 199, 26, 0.3)');
-    glowGrad.addColorStop(0.5, 'rgba(245, 199, 26, 0.05)');
-    glowGrad.addColorStop(1, 'rgba(245, 199, 26, 0)');
-    glowCtx.fillStyle = glowGrad;
-    glowCtx.fillRect(0, 0, glowSize * 2, glowSize * 2);
+
+    function makeGlowSprite(r, g, b) {
+      const c = document.createElement('canvas');
+      c.width = glowSize * 2;
+      c.height = glowSize * 2;
+      const cx = c.getContext('2d');
+      const gr = cx.createRadialGradient(glowSize, glowSize, 0, glowSize, glowSize, glowSize);
+      gr.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.3)`);
+      gr.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, 0.05)`);
+      gr.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+      cx.fillStyle = gr;
+      cx.fillRect(0, 0, glowSize * 2, glowSize * 2);
+      return c;
+    }
+
+    const glowGold = makeGlowSprite(245, 199, 26);
+    const glowWhite = makeGlowSprite(232, 226, 214);
 
     class Particle {
       constructor() {
@@ -1119,6 +1132,9 @@
         this.holdCounter = 0;
         this.wobble = Math.random() * Math.PI * 2;
         this.wobbleSpeed = Math.random() * 0.02 + 0.01;
+        this.isGold = Math.random() < 0.5;
+        this.glowSprite = this.isGold ? glowGold : glowWhite;
+        this.coreColor = this.isGold ? '#F5C71A' : '#E8E2D6';
       }
 
       update() {
@@ -1155,20 +1171,20 @@
 
         // Draw pre-rendered glow sprite (FAST — no gradient creation)
         const drawSize = this.size * 6;
-        ctx.drawImage(glowCanvas, this.x - drawSize, this.y - drawSize, drawSize * 2, drawSize * 2);
+        ctx.drawImage(this.glowSprite, this.x - drawSize, this.y - drawSize, drawSize * 2, drawSize * 2);
 
         // Core dot
-        ctx.fillStyle = '#F5C71A';
+        ctx.fillStyle = this.coreColor;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Mobile: fewer particles
+    // Mobile: balanced count, Desktop: richer
     const particleCount = isMobile
-      ? Math.min(Math.floor((window.innerWidth * window.innerHeight) / 40000), 12)
-      : Math.min(Math.floor((window.innerWidth * window.innerHeight) / 18000), 50);
+      ? Math.min(Math.floor((window.innerWidth * window.innerHeight) / 30000), 16)
+      : Math.min(Math.floor((window.innerWidth * window.innerHeight) / 14000), 60);
 
     for (let i = 0; i < particleCount; i++) {
       const p = new Particle();
