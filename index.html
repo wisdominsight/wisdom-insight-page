@@ -21,13 +21,10 @@
       --surface:  #12110F;
       --deep:     #060504;
       --text:     #E8E2D6;
-      --text-dim: #B5AFA5;
-      --muted:    #6B6560;
-      --accent:   #F5C71A;
-      --accent2:  #D9BC7E;
-      --accent3:  #A8884A;
+      --gold:     #F5C71A;
+      --gold-dim: rgba(245, 199, 26, 0.55);
+      --gold-faint: rgba(245, 199, 26, 0.25);
       --border:   #F5C71A;
-      --border2:  #F5C71A;
     }
 
     *, *::before, *::after {
@@ -83,7 +80,7 @@
       left: 0;
       width: 0%;
       height: 1px;
-      background: linear-gradient(90deg, var(--accent3), var(--accent), var(--accent2));
+      background: linear-gradient(90deg, var(--gold), #FFE066, var(--gold));
       z-index: 1000;
       transition: width 0.1s linear;
     }
@@ -118,7 +115,89 @@
 
     @keyframes subtleGlow {
       0%, 100% { opacity: 0.02; }
-      50%      { opacity: 0.05; }
+      50%      { opacity: 0.06; }
+    }
+
+    /* ============================================
+       GOLDEN PARTICLES (FIREFLIES)
+       ============================================ */
+
+    .particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ============================================
+       LIGHT RAYS
+       ============================================ */
+
+    .light-rays {
+      position: fixed;
+      top: -30%;
+      left: 50%;
+      width: 200%;
+      height: 160%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .light-ray {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, 
+        transparent 0%, 
+        rgba(245, 199, 26, 0.04) 20%, 
+        rgba(245, 199, 26, 0.08) 50%, 
+        rgba(245, 199, 26, 0.04) 80%, 
+        transparent 100%);
+      transform-origin: top center;
+      animation: rayDrift 12s ease-in-out infinite;
+    }
+
+    .light-ray:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 14s; opacity: 0.5; transform: rotate(-8deg); }
+    .light-ray:nth-child(2) { left: 25%; animation-delay: -3s; animation-duration: 18s; opacity: 0.3; transform: rotate(-3deg); width: 3px; }
+    .light-ray:nth-child(3) { left: 45%; animation-delay: -6s; animation-duration: 16s; opacity: 0.4; transform: rotate(2deg); }
+    .light-ray:nth-child(4) { left: 60%; animation-delay: -2s; animation-duration: 20s; opacity: 0.25; transform: rotate(5deg); width: 1px; }
+    .light-ray:nth-child(5) { left: 78%; animation-delay: -8s; animation-duration: 15s; opacity: 0.35; transform: rotate(8deg); width: 2px; }
+    .light-ray:nth-child(6) { left: 90%; animation-delay: -4s; animation-duration: 17s; opacity: 0.2; transform: rotate(-5deg); }
+
+    @keyframes rayDrift {
+      0%, 100% { opacity: 0.15; transform: rotate(var(--ray-angle, 0deg)) translateX(0); }
+      25%      { opacity: 0.4; }
+      50%      { opacity: 0.15; transform: rotate(var(--ray-angle, 0deg)) translateX(20px); }
+      75%      { opacity: 0.35; }
+    }
+
+    /* ============================================
+       GOLDEN ORB (top glow)
+       ============================================ */
+
+    .golden-orb {
+      position: fixed;
+      top: -15vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 199, 26, 0.06) 0%, rgba(245, 199, 26, 0.02) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: orbPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+      50%      { transform: translateX(-50%) scale(1.15); opacity: 1; }
     }
 
     /* ============================================
@@ -134,14 +213,14 @@
       pointer-events: none;
       z-index: -1;
       background:
-        radial-gradient(ellipse 60% 40% at 50% 15%, rgba(196, 162, 101, 0.035), transparent),
-        radial-gradient(ellipse 35% 45% at 80% 75%, rgba(196, 162, 101, 0.015), transparent),
-        radial-gradient(ellipse 40% 30% at 20% 50%, rgba(196, 162, 101, 0.01), transparent);
+        radial-gradient(ellipse 60% 40% at 50% 15%, rgba(245, 199, 26, 0.035), transparent),
+        radial-gradient(ellipse 35% 45% at 80% 75%, rgba(245, 199, 26, 0.015), transparent),
+        radial-gradient(ellipse 40% 30% at 20% 50%, rgba(245, 199, 26, 0.01), transparent);
       animation: subtleGlow 10s ease-in-out infinite;
     }
 
     /* ============================================
-       SIDE LINES — VERTICAL DECORATION
+       SIDE LINES
        ============================================ */
 
     .side-line-left,
@@ -150,7 +229,7 @@
       top: 0;
       width: 1px;
       height: 100%;
-      background: linear-gradient(180deg, transparent, var(--accent), transparent);
+      background: linear-gradient(180deg, transparent, var(--gold), transparent);
       opacity: 0.04;
       pointer-events: none;
       z-index: -1;
@@ -171,6 +250,8 @@
       flex-direction: column;
       align-items: center;
       gap: 14px;
+      position: relative;
+      z-index: 2;
     }
 
     .logo-container {
@@ -181,15 +262,14 @@
     }
 
     .site-logo {
-  width: 68px; /* Anda dapat menyesuaikan ukuran ini jika logo terasa terlalu kecil */
-  height: 68px;
-  /* border-radius: 50%; */ /* Hapus atau komentari ini agar logo tidak dipaksa melingkar */
-  object-fit: contain; /* Ubah object-fit ke contain agar seluruh logo terlihat tanpa terpotong */
-  opacity: 0.9;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  position: relative;
-  z-index: 1;
-  }
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+      opacity: 0.9;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      position: relative;
+      z-index: 1;
+    }
 
     .site-logo:hover {
       opacity: 1;
@@ -201,7 +281,7 @@
       width: 82px;
       height: 82px;
       border-radius: 50%;
-      border: 1px solid var(--accent);
+      border: 1px solid var(--gold);
       opacity: 0.2;
       animation: subtleGlow 6s ease-in-out infinite;
     }
@@ -210,14 +290,14 @@
       font-family: 'Inter', sans-serif;
       font-weight: 300;
       font-size: 0.65rem;
-      color: var(--muted);
+      color: var(--gold-dim);
       letter-spacing: 0.28em;
       text-transform: lowercase;
       transition: color 0.3s ease;
     }
 
     .site-header .header-handle:hover {
-      color: var(--accent);
+      color: var(--gold);
     }
 
     /* ============================================
@@ -230,29 +310,31 @@
       align-items: center;
       gap: 6px;
       margin-bottom: 1vh;
+      position: relative;
+      z-index: 2;
     }
 
     .ornament-line {
       width: 48px;
       height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent));
+      background: linear-gradient(90deg, transparent, var(--gold));
       opacity: 0.5;
     }
 
     .ornament-line:last-child {
-      background: linear-gradient(90deg, var(--accent), transparent);
+      background: linear-gradient(90deg, var(--gold), transparent);
     }
 
     .ornament-diamond {
       width: 5px;
       height: 5px;
       transform: rotate(45deg);
-      background-color: var(--accent);
+      background-color: var(--gold);
       opacity: 0.4;
     }
 
     /* ============================================
-       HERO — BAGIAN 1
+       HERO
        ============================================ */
 
     .hero {
@@ -263,6 +345,7 @@
       align-items: center;
       text-align: center;
       position: relative;
+      z-index: 2;
     }
 
     .hero-text {
@@ -284,11 +367,12 @@
       font-family: 'Cinzel', serif;
       font-weight: 900;
       font-size: clamp(1.6rem, 5.5vw, 2.5rem);
-      color: var(--accent);
+      color: var(--gold);
       line-height: 1.3;
       display: block;
       margin-bottom: 0.6em;
       letter-spacing: 0.04em;
+      text-shadow: 0 0 40px rgba(245, 199, 26, 0.2);
     }
 
     .hero-text .line-tension {
@@ -296,7 +380,7 @@
       font-weight: 300;
       font-style: italic;
       font-size: clamp(0.9rem, 2.8vw, 1.05rem);
-      color: var(--muted);
+      color: var(--gold-dim);
       letter-spacing: 0.06em;
       display: block;
     }
@@ -308,7 +392,7 @@
       transform: translateX(-50%);
       width: 1px;
       height: 44px;
-      background: linear-gradient(180deg, var(--accent), transparent);
+      background: linear-gradient(180deg, var(--gold), transparent);
       opacity: 0.15;
       animation: scrollPulse 3s ease-in-out infinite;
     }
@@ -320,7 +404,7 @@
       left: -2.5px;
       width: 6px;
       height: 6px;
-      border: 1px solid var(--accent);
+      border: 1px solid var(--gold);
       border-radius: 50%;
       opacity: 0.3;
       background: transparent;
@@ -336,6 +420,8 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative;
+      z-index: 2;
     }
 
     p {
@@ -347,7 +433,7 @@
     }
 
     /* ============================================
-       NARASI — BAGIAN 2 & 4
+       NARASI
        ============================================ */
 
     .narrative {
@@ -361,7 +447,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-weight: 400;
       font-size: clamp(1rem, 3vw, 1.15rem);
-      color: var(--text-dim);
+      color: var(--gold-dim);
       line-height: 2;
       letter-spacing: 0.01em;
     }
@@ -382,7 +468,7 @@
       font-weight: 500;
       font-style: italic;
       font-size: clamp(1rem, 3vw, 1.15rem);
-      color: var(--accent);
+      color: var(--gold);
       letter-spacing: 0.02em;
       position: relative;
       display: inline-block;
@@ -395,12 +481,12 @@
       left: 0;
       width: 100%;
       height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
       opacity: 0.35;
     }
 
     /* ============================================
-       THREE KEYS — BAGIAN 3 (EDICT STYLE)
+       THREE KEYS (EDICT STYLE)
        ============================================ */
 
     .keys-container {
@@ -413,7 +499,7 @@
       font-family: 'Cinzel', serif;
       font-weight: 500;
       font-size: clamp(0.75rem, 2.2vw, 0.85rem);
-      color: var(--text);
+      color: var(--gold);
       letter-spacing: 0.2em;
       text-align: center;
       margin-bottom: 7vh;
@@ -422,7 +508,7 @@
 
     .key-item {
       padding: 3.5vh 0;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--gold-faint);
       display: grid;
       grid-template-columns: auto 1fr;
       gap: 0 2.2rem;
@@ -439,7 +525,7 @@
       top: 0;
       width: 0;
       height: 100%;
-      background: linear-gradient(90deg, rgba(196, 162, 101, 0.03), transparent);
+      background: linear-gradient(90deg, rgba(245, 199, 26, 0.04), transparent);
       transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
@@ -448,23 +534,23 @@
     }
 
     .key-item:hover {
-      border-top-color: rgba(196, 162, 101, 0.15);
+      border-top-color: rgba(245, 199, 26, 0.25);
     }
 
     .key-item:last-child {
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--gold-faint);
     }
 
     .key-item:last-child:hover {
-      border-bottom-color: rgba(196, 162, 101, 0.15);
+      border-bottom-color: rgba(245, 199, 26, 0.25);
     }
 
     .key-number {
       font-family: 'Cinzel', serif;
       font-size: 2.4rem;
       font-weight: 900;
-      color: var(--accent);
-      opacity: 0.1;
+      color: var(--gold);
+      opacity: 0.12;
       line-height: 1;
       user-select: none;
       transition: opacity 0.5s ease;
@@ -475,7 +561,7 @@
     }
 
     .key-item:hover .key-number {
-      opacity: 0.22;
+      opacity: 0.3;
     }
 
     .key-text {
@@ -498,7 +584,7 @@
     }
 
     .key-item:hover .key-text strong {
-      color: var(--accent2);
+      color: var(--gold);
     }
 
     .key-text span {
@@ -506,7 +592,7 @@
       font-weight: 400;
       font-style: italic;
       font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-      color: var(--text-dim);
+      color: var(--gold-dim);
       display: block;
       margin-top: 0.4em;
       line-height: 1.6;
@@ -519,13 +605,15 @@
     .section-divider {
       border: none;
       height: 1px;
-      background: linear-gradient(90deg, transparent 5%, var(--accent) 50%, transparent 95%);
+      background: linear-gradient(90deg, transparent 5%, var(--gold) 50%, transparent 95%);
       margin-bottom: 0;
       opacity: 0.2;
+      position: relative;
+      z-index: 2;
     }
 
     /* ============================================
-       CTA — BAGIAN 5
+       CTA
        ============================================ */
 
     .cta-section {
@@ -533,6 +621,8 @@
       padding-bottom: 10vh;
       min-height: auto;
       display: block;
+      position: relative;
+      z-index: 2;
     }
 
     .cta-text {
@@ -547,7 +637,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-weight: 400;
       font-size: clamp(0.95rem, 2.8vw, 1.08rem);
-      color: var(--text-dim);
+      color: var(--gold-dim);
       line-height: 2;
       letter-spacing: 0.01em;
     }
@@ -556,7 +646,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-weight: 500;
       font-style: italic;
-      color: var(--accent);
+      color: var(--gold);
       font-size: clamp(0.95rem, 2.8vw, 1.08rem);
       letter-spacing: 0.02em;
     }
@@ -570,8 +660,8 @@
       align-items: center;
       gap: 12px;
       background: transparent;
-      border: 1px solid var(--accent);
-      color: var(--accent);
+      border: 1px solid var(--gold);
+      color: var(--gold);
       padding: 18px 48px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
@@ -590,7 +680,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: var(--accent);
+      background: var(--gold);
       transform: scaleX(0);
       transform-origin: left;
       transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
@@ -603,8 +693,8 @@
 
     .wa-button:hover {
       color: var(--bg);
-      border-color: var(--accent);
-      box-shadow: 0 4px 40px rgba(196, 162, 101, 0.12), 0 0 80px rgba(196, 162, 101, 0.04);
+      border-color: var(--gold);
+      box-shadow: 0 4px 40px rgba(245, 199, 26, 0.15), 0 0 80px rgba(245, 199, 26, 0.06);
     }
 
     .wa-button:active {
@@ -634,6 +724,8 @@
       flex-direction: column;
       align-items: center;
       gap: 14px;
+      position: relative;
+      z-index: 2;
     }
 
     .footer-ornament {
@@ -645,19 +737,19 @@
     .footer-ornament .f-line {
       width: 28px;
       height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent));
+      background: linear-gradient(90deg, transparent, var(--gold));
       opacity: 0.25;
     }
 
     .footer-ornament .f-line:last-child {
-      background: linear-gradient(90deg, var(--accent), transparent);
+      background: linear-gradient(90deg, var(--gold), transparent);
     }
 
     .footer-ornament .f-diamond {
       width: 4px;
       height: 4px;
       transform: rotate(45deg);
-      background-color: var(--accent);
+      background-color: var(--gold);
       opacity: 0.3;
     }
 
@@ -665,13 +757,13 @@
       font-family: 'Inter', sans-serif;
       font-weight: 300;
       font-size: 0.6rem;
-      color: var(--muted);
+      color: var(--gold-dim);
       letter-spacing: 0.3em;
       text-transform: lowercase;
     }
 
     /* ============================================
-       RESPONSIVE — Tablet & Mobile
+       RESPONSIVE
        ============================================ */
 
     @media (max-width: 768px) {
@@ -743,7 +835,7 @@
        ============================================ */
 
     ::selection {
-      background: rgba(196, 162, 101, 0.2);
+      background: rgba(245, 199, 26, 0.25);
       color: var(--text);
     }
 
@@ -754,17 +846,19 @@
         transition: none;
       }
 
-      .scroll-indicator {
+      .scroll-indicator,
+      .ambient-glow,
+      .logo-ring,
+      .particles-canvas,
+      .light-rays,
+      .golden-orb {
         animation: none;
-        opacity: 0.1;
       }
 
-      .ambient-glow {
-        animation: none;
-      }
-
-      .logo-ring {
-        animation: none;
+      .particles-canvas,
+      .light-rays,
+      .golden-orb {
+        display: none;
       }
 
       html {
@@ -781,6 +875,22 @@
   <!-- Scroll Progress Bar -->
   <div class="scroll-progress" id="scrollProgress"></div>
 
+  <!-- Golden Orb -->
+  <div class="golden-orb"></div>
+
+  <!-- Light Rays -->
+  <div class="light-rays">
+    <div class="light-ray"></div>
+    <div class="light-ray"></div>
+    <div class="light-ray"></div>
+    <div class="light-ray"></div>
+    <div class="light-ray"></div>
+    <div class="light-ray"></div>
+  </div>
+
+  <!-- Golden Particles Canvas -->
+  <canvas class="particles-canvas" id="particlesCanvas"></canvas>
+
   <!-- Ambient Background Glow -->
   <div class="ambient-glow"></div>
 
@@ -790,9 +900,11 @@
 
   <!-- HEADER -->
   <header class="site-header reveal">
-  <div class="logo-container">
-    <img src="logo_wi.png" alt="Wisdom Insight" class="site-logo"> </div>
-  <span class="header-handle">@wisdom.insight_</span>
+    <div class="logo-container">
+      <div class="logo-ring"></div>
+      <img src="logo_wi.png" alt="Wisdom Insight" class="site-logo">
+    </div>
+    <span class="header-handle">@wisdom.insight_</span>
   </header>
 
   <!-- ORNAMEN PEMBUKA -->
@@ -815,10 +927,8 @@
   <!-- BAGIAN 2 — NARASI -->
   <section>
     <div class="narrative reveal">
-      <p>
+      <p style="color: var(--text)">
         Tidak peduli statusmu, raja atau orang biasa, hidupmu dikendalikan sesuatu atau kamu yang mengendalikannya.
-      </p>
-      <p>
         Semuanya bergantung pada satu hal: <span class="sub-highlight">sebaik apa rutinitasmu.</span>
       </p>
     </div>
@@ -869,15 +979,15 @@
   <!-- BAGIAN 5 — CTA -->
   <div class="cta-section">
     <div class="cta-text reveal">
-      <p>
-        Kalau kamu berminat ingin lebih dalam —<br>
+      <p style="color: var(--text)">
+        Kalau kamu berminat ingin lebih dalam<br>
         ceritakan kondisimu dan kendalamu.
       </p>
       <p>
         <span class="cta-emphasis">Baik kamu sudah berjalan dan mau memperkuat,<br>
         atau kamu masih mencari arah yang tepat.</span>
       </p>
-      <p>
+      <p style="color: var(--text)">
         Semakin detail kamu bercerita,<br>
         semakin tepat arah yang bisa diberikan.
       </p>
@@ -906,10 +1016,10 @@
   </footer>
 
   <!-- ============================================
-       JAVASCRIPT — Scroll Animations & Progress
+       JAVASCRIPT
        ============================================ -->
   <script>
-    // Intersection Observer for scroll-triggered animations
+    // ── Intersection Observer for scroll-triggered animations ──
     const observerOptions = {
       root: null,
       rootMargin: '0px 0px -80px 0px',
@@ -925,11 +1035,9 @@
       });
     }, observerOptions);
 
-    document.querySelectorAll('.reveal').forEach(el => {
-      observer.observe(el);
-    });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // Scroll progress bar
+    // ── Scroll progress bar ──
     const progressBar = document.getElementById('scrollProgress');
 
     function updateProgress() {
@@ -942,6 +1050,123 @@
     window.addEventListener('scroll', updateProgress, { passive: true });
     window.addEventListener('resize', updateProgress, { passive: true });
     updateProgress();
+
+    // ── Golden Particles (Fireflies) ──
+    const canvas = document.getElementById('particlesCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animId;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2.5 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = -Math.random() * 0.4 - 0.1;
+        this.opacity = 0;
+        this.targetOpacity = Math.random() * 0.5 + 0.1;
+        this.fadeSpeed = Math.random() * 0.005 + 0.002;
+        this.phase = 'in'; // in, hold, out
+        this.holdTime = Math.random() * 200 + 100;
+        this.holdCounter = 0;
+        this.wobble = Math.random() * Math.PI * 2;
+        this.wobbleSpeed = Math.random() * 0.02 + 0.01;
+      }
+
+      update() {
+        this.wobble += this.wobbleSpeed;
+        this.x += this.speedX + Math.sin(this.wobble) * 0.15;
+        this.y += this.speedY;
+
+        if (this.phase === 'in') {
+          this.opacity += this.fadeSpeed;
+          if (this.opacity >= this.targetOpacity) {
+            this.opacity = this.targetOpacity;
+            this.phase = 'hold';
+          }
+        } else if (this.phase === 'hold') {
+          this.holdCounter++;
+          if (this.holdCounter >= this.holdTime) {
+            this.phase = 'out';
+          }
+        } else if (this.phase === 'out') {
+          this.opacity -= this.fadeSpeed;
+          if (this.opacity <= 0) {
+            this.reset();
+          }
+        }
+
+        // Wrap around edges
+        if (this.y < -20) this.y = canvas.height + 20;
+        if (this.x < -20) this.x = canvas.width + 20;
+        if (this.x > canvas.width + 20) this.x = -20;
+      }
+
+      draw() {
+        if (this.opacity <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+
+        // Outer glow
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 6);
+        grad.addColorStop(0, 'rgba(245, 199, 26, 0.3)');
+        grad.addColorStop(0.5, 'rgba(245, 199, 26, 0.05)');
+        grad.addColorStop(1, 'rgba(245, 199, 26, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Core dot
+        ctx.fillStyle = '#F5C71A';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    // Spawn particles based on screen size
+    const particleCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 18000), 50);
+    for (let i = 0; i < particleCount; i++) {
+      const p = new Particle();
+      p.holdCounter = Math.random() * 200; // stagger start
+      particles.push(p);
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      animId = requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+
+    // Pause when tab not visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animId);
+      } else {
+        animateParticles();
+      }
+    });
   </script>
 
 </body>
